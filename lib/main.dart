@@ -1,31 +1,29 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solarcellanalysis/states/find_apikey.dart';
 import 'package:solarcellanalysis/states/main_home.dart';
 import 'package:solarcellanalysis/utility/my_constant.dart';
 
-
 final Map<String, WidgetBuilder> map = {
-  Myconstant.routeMainHome:(context) => const MainHome(),
-  Myconstant.routeFindAPIkey:(context) => const FindApiKey(),
+  Myconstant.routeMainHome: (context) => const MainHome(),
+  Myconstant.routeFindAPIkey: (context) => const FindApiKey(),
 };
-String? firstState; 
-
+String? firstState;
 
 Future<void> main() async {
+  HttpOverrides.global = MyOverrideHttp();
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+  var result = preferences.getStringList('data');
+  print('result ==> $result');
+  if (result == null) {
+    firstState = Myconstant.routeFindAPIkey;
+  } else {
+    firstState = Myconstant.routeMainHome;
+  }
 
-
- WidgetsFlutterBinding.ensureInitialized();
- SharedPreferences preferences = await SharedPreferences.getInstance();
- var result = preferences.getStringList('data');
- print('result ==> $result');
- if (result ==null) {
-   firstState = Myconstant.routeFindAPIkey;
- } else {
-   firstState = Myconstant.routeMainHome;
- }
-
-  
   runApp(MyApp());
 }
 
@@ -37,8 +35,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       routes: map,
       initialRoute: firstState,
     );
+  }
+}
+
+class MyOverrideHttp extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (cert, host, port) => true;
   }
 }
