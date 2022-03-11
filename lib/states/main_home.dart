@@ -1,10 +1,17 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solarcellanalysis/models/details_model.dart';
+import 'package:solarcellanalysis/models/menu_model.dart';
+import 'package:solarcellanalysis/models/overview_model.dart';
+import 'package:solarcellanalysis/models/site_current_power_flow_model.dart';
 import 'package:solarcellanalysis/utility/my_constant.dart';
+import 'package:solarcellanalysis/widgets/show_button.dart';
+import 'package:solarcellanalysis/widgets/show_card.dart';
 import 'package:solarcellanalysis/widgets/show_progress.dart';
+import 'package:solarcellanalysis/widgets/show_signout.dart';
 import 'package:solarcellanalysis/widgets/show_text.dart';
 
 class MainHome extends StatefulWidget {
@@ -21,25 +28,59 @@ class _MainHomeState extends State<MainHome> {
   bool load = true;
   String? urlImage;
 
+  var titleMenus = <String>[
+    'Site Details',
+    'Settings',
+    'About',
+    'Logout',
+  ];
+  var pathRounts = <String>[
+    Myconstant.routeSiteDetails,
+    Myconstant.routeSettings,
+    Myconstant.routeAbout,
+    '',
+  ];
+
+  var menuModels = <MenuModel>[];
+
+  var chooseMenu;
+
+  OverviewModel? overviewModel;
+  SiteCurrentPowerFlow? siteCurrentPowerFlow;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     readData();
+    setupMenu();
+    readOverview();
+  }
+
+  void readOverview() {
+    String pathAPI =
+        'https://monitoringapi.solaredge.com/ site/1598054/overview?api_key=VVOX8PCKBXGAHY3E2HKVJLTHDWSZH81M';
+  }
+
+  void setupMenu() {
+    int index = 0;
+    for (var item in titleMenus) {
+      MenuModel model = MenuModel(title: item, pathRoute: pathRounts[index]);
+      menuModels.add(model);
+      index++;
+    }
   }
 
   Future<void> readData() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     var datas = preferences.getStringList('data');
-    //print('data ==> $datas');
+    // for Read Details
 
     String pathAPI =
         'https://monitoringapi.solaredge.com/site/${datas![0]}/details?api_key=${datas[1]}';
     await Dio().get(pathAPI).then((value) {
-      //print('value ==< $value');
       Map<String, dynamic> map = value.data;
       var detailsMap = map['details'];
-      //print('detailsMap ==> $detailsMap');
 
       setState(() {
         detailsModel = DetailsModel.fromMap(detailsMap);
@@ -47,66 +88,253 @@ class _MainHomeState extends State<MainHome> {
         urlImage =
             'https://monitoringapi.solaredge.com${detailsModel!.uris.SITEIMAGE}?hash=123456789&api_key=${datas[1]}';
       });
-//print('name ==>> ${detailsModel.name}');
-//print('address ==>> ${detailsModel.location.address}');
+    });
+
+    // for OverView
+
+    String pathOverView =
+        'https://monitoringapi.solaredge.com/site/${datas[0]}/overview?api_key=${datas[1]}';
+    await Dio().get(pathOverView).then((value) {
+      var result = value.data['overview'];
+      setState(() {
+        overviewModel = OverviewModel.fromMap(result);
+      });
+    });
+
+    // for CurrentPowerFlow
+    String pathCurrentPowerFlow =
+        'https://monitoringapi.solaredge.com/site/${datas[0]}/currentPowerFlow?api_key=${datas[1]}';
+    await Dio().get(pathCurrentPowerFlow).then((value) {
+      var result = value.data['siteCurrentPowerFlow'];
+      print('result CurrentPowerFlow ==>> $result');
+      setState(() {
+        siteCurrentPowerFlow = SiteCurrentPowerFlow.fromMap(result);
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
+      floatingActionButton: ShowSignOut(),
       body: load
           ? ShowProgress()
-          : LayoutBuilder(builder: (context, Constraints) {
-              return Container(
-                width: Constraints.maxWidth,
-                height: 180,
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: NetworkImage(urlImage!), fit: BoxFit.cover)),
-                child: Container(decoration: BoxDecoration(color: Colors.black.withOpacity(0.5)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(
-                          height: 16,
-                        ),
-                        ShowText(label: detailsModel!.name, textStyle: Myconstant().h2WhiteStyle(),),
-                        ListTile(
-                          leading: const Icon(
-                            Icons.location_on_outlined,
-                            color: Colors.white,
-                          ),
-                          title: ShowText(
-                            label: detailsModel!.location.address,
-                            textStyle: Myconstant().h3WhiteStyle(),
-                          ),
-                        ),
-                        Row(
+          : LayoutBuilder(builder: (context, constraints) {
+              return Column(
+                children: [
+                  newinforTop(constraints),
+                  newPowerLoadGrid(constraints),
+                  SizedBox(
+                    height: constraints.maxWidth * 0.25,
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            const Icon(
-                              Icons.flash_on_sharp,
-                              color: Colors.white,
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                const ShowText(label: 'Today'),
+                                ShowText(
+                                  label: overviewModel == null
+                                      ? ''
+                                      : calculateValue(
+                                          overviewModel!.lastDayData.energy),
+                                  textStyle: Myconstant().h2Style(),
+                                ),
+                                ShowText(label: ''),
+                              ],
                             ),
-                            ShowText(
-                              label: detailsModel!.peakPower.toString(),
-                              textStyle: Myconstant().h1WhiteStyle(),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                ShowText(label: 'This Mounth'),
+                                ShowText(
+                                  label: overviewModel == null
+                                      ? ''
+                                      : calculateValue(
+                                          overviewModel!.lastMonthData.energy),
+                                  textStyle: Myconstant().h2Style(),
+                                ),
+                                ShowText(label: ''),
+                              ],
                             ),
-                            ShowText(
-                              label: 'kWp',
-                              textStyle: Myconstant().h3WhiteStyle(),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                ShowText(label: 'LifeTime'),
+                                ShowText(
+                                  label: overviewModel == null
+                                      ? ''
+                                      : calculateValue(
+                                          overviewModel!.lifeTimeData.energy),
+                                  textStyle: Myconstant().h2Style(),
+                                ),
+                                ShowText(
+                                  label: overviewModel == null
+                                      ? ''
+                                      : calculateCurrency(
+                                          overviewModel!.lifeTimeData.revenue),
+                                  textStyle: Myconstant().h3GreenStyle(),
+                                ),
+                              ],
                             ),
                           ],
-                        )
-                      ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
+                  )
+                ],
               );
             }),
     );
+  }
+
+  Row newPowerLoadGrid(BoxConstraints Constraints) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        ShowCard(
+          size: Constraints.maxWidth * 0.33,
+          label: overviewModel == null
+              ? ''
+              : '${overviewModel!.currentPower.power} kW',
+          pathImage: 'images/current_power.png',
+        ),
+        ShowCard(
+            size: Constraints.maxWidth * 0.33,
+            label: siteCurrentPowerFlow == null
+                ? ''
+                : '${siteCurrentPowerFlow!.load.currentPower} ${siteCurrentPowerFlow!.unit}',
+            pathImage: 'images/load.png'),
+        ShowCard(
+            size: Constraints.maxWidth * 0.33,
+            label: siteCurrentPowerFlow == null
+                ? ''
+                : '${siteCurrentPowerFlow!.grid.currentPower} ${siteCurrentPowerFlow!.unit}',
+            pathImage: 'images/grid.png'),
+      ],
+    );
+  }
+
+  Container newinforTop(BoxConstraints Constraints) {
+    return Container(
+      width: Constraints.maxWidth,
+      height: 200,
+      decoration: BoxDecoration(
+          image: DecorationImage(
+              image: NetworkImage(urlImage!), fit: BoxFit.cover)),
+      child: Container(
+        decoration: BoxDecoration(color: Colors.black.withOpacity(0.5)),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 16,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    width: Constraints.maxWidth * 0.60,
+                    child: ShowText(
+                      label: detailsModel!.name,
+                      textStyle: Myconstant().h2WhiteStyle(),
+                    ),
+                  ),
+                  newDropDownMenu(),
+                ],
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.location_on_outlined,
+                  color: Colors.white,
+                ),
+                title: ShowText(
+                  label: detailsModel!.location.address,
+                  textStyle: Myconstant().h3WhiteStyle(),
+                ),
+              ),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.flash_on_sharp,
+                    color: Colors.white,
+                  ),
+                  ShowText(
+                    label: detailsModel!.peakPower.toString(),
+                    textStyle: Myconstant().h1WhiteStyle(),
+                  ),
+                  ShowText(
+                    label: 'kWp',
+                    textStyle: Myconstant().h3WhiteStyle(),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget newDropDownMenu() => DropdownButton<dynamic>(
+      icon: const Icon(
+        Icons.more_vert,
+        color: Colors.white,
+      ),
+      value: chooseMenu,
+      items: menuModels
+          .map(
+            (e) => DropdownMenuItem(
+              child: ShowText(label: e.title),
+              value: e,
+            ),
+          )
+          .toList(),
+      onChanged: (value) {
+        MenuModel menuModel = value;
+        if (menuModel.pathRoute.isNotEmpty) {
+          print('Status Route ==>> ${menuModel.pathRoute}');
+          Navigator.pushNamed(context, menuModel.pathRoute);
+        } else {
+          print('Status Logout');
+        }
+      });
+
+  String calculateValue(double energy) {
+    String unit;
+    String result;
+
+    print('ค่าที่ต้องการจะแปลง ==>> $energy');
+
+    double energyValue = energy;
+    if (energyValue > 1000000) {
+      unit = ' MWh';
+      energyValue = energyValue / 1000000;
+    } else if (energyValue > 1000) {
+      unit = ' kWh';
+      energyValue = energyValue / 1000;
+    } else {
+      unit = 'Wh';
+    }
+
+    NumberFormat numberFormat = NumberFormat('##0.0#', 'en_US');
+    String string = numberFormat.format(energyValue);
+
+    result = '$string $unit';
+    return result;
+  }
+
+  String calculateCurrency(double revenue) {
+    String result;
+    NumberFormat numberFormat = NumberFormat('#,###.#', 'en_US');
+    String string = numberFormat.format(revenue);
+    result = '฿ $string';
+    return result;
   }
 }

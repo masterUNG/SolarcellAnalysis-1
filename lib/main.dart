@@ -2,13 +2,21 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:solarcellanalysis/states/about.dart';
+import 'package:solarcellanalysis/states/add_site_id.dart';
 import 'package:solarcellanalysis/states/find_apikey.dart';
 import 'package:solarcellanalysis/states/main_home.dart';
+import 'package:solarcellanalysis/states/setting.dart';
+import 'package:solarcellanalysis/states/site_details.dart';
 import 'package:solarcellanalysis/utility/my_constant.dart';
 
 final Map<String, WidgetBuilder> map = {
   Myconstant.routeMainHome: (context) => const MainHome(),
   Myconstant.routeFindAPIkey: (context) => const FindApiKey(),
+  Myconstant.routeSiteDetails: (context) => const SiteDetail(),
+  Myconstant.routeSettings: (context) => const Setting(),
+  Myconstant.routeAbout: (context) => const About(),
+  Myconstant.routeAddSiteId:(context) => const AddSiteId(),
 };
 String? firstState;
 
@@ -38,6 +46,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routes: map,
       initialRoute: firstState,
+     
     );
   }
 }
