@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:solarcellanalysis/utility/my_constant.dart';
 
 class ShowButton extends StatelessWidget {
   final String label;
@@ -11,9 +12,11 @@ class ShowButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: pressFunc,
-      child: Text(label),
+    return Container(margin: const EdgeInsets.symmetric(vertical: 8),
+      child: ElevatedButton(style: ElevatedButton.styleFrom(primary:  Myconstant.primary),
+        onPressed: pressFunc,
+        child: Text(label),
+      ),
     );
   }
 }

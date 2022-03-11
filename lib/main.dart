@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solarcellanalysis/states/about.dart';
@@ -16,18 +17,19 @@ final Map<String, WidgetBuilder> map = {
   Myconstant.routeSiteDetails: (context) => const SiteDetail(),
   Myconstant.routeSettings: (context) => const Setting(),
   Myconstant.routeAbout: (context) => const About(),
-  Myconstant.routeAddSiteId:(context) => const AddSiteId(),
+  Myconstant.routeAddSiteId: (context) => const AddSiteId(),
 };
 String? firstState;
 
 Future<void> main() async {
   HttpOverrides.global = MyOverrideHttp();
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   SharedPreferences preferences = await SharedPreferences.getInstance();
   var result = preferences.getStringList('data');
-  print('result ==> $result');
+  //print('result ==> $result');
   if (result == null) {
-    firstState = Myconstant.routeFindAPIkey;
+    firstState = Myconstant.routeAddSiteId;
   } else {
     firstState = Myconstant.routeMainHome;
   }
@@ -46,7 +48,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routes: map,
       initialRoute: firstState,
-     
     );
   }
 }

@@ -7,15 +7,15 @@ class Myconstant {
   static String routeSettings = '/settings';
   static String routeAbout = '/about';
   static String routeAddSiteId = '/addSiteId';
-  
+  //Thai Paper Mill
   static String apiKey = '09HQHOJQYBLAF6N96LHGCGRFS68X13A9';
   static String siteId = '2345733';
   static String apiKeyTPM = '09HQHOJQYBLAF6N96LHGCGRFS68X13A9';
   static String siteIdTPM = '2345733';
 
-  static Color primary = const Color(0xffd85c00);
+  static Color primary = const Color.fromARGB(255, 252, 135, 2);
   static Color dark = Colors.black;
-  static Color light = const Color(0xffff8c3a);
+  static Color light = const Color.fromARGB(255, 226, 128, 58);
 
   TextStyle h1Style() => TextStyle(
         color: dark,

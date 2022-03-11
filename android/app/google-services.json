@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "996710698190",
+    "project_id": "solarcellanalysis",
+    "storage_bucket": "solarcellanalysis.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:996710698190:android:af2499b7e35736451fd49f",
+        "android_client_info": {
+          "package_name": "com.tasolar.solarcellanalysis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "996710698190-gb2ghslmrq81j23s2o4ai3esis8ocnu2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCa9QAdwLEjR0-zElXxxmWBzX_6pK_dD54"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "996710698190-gb2ghslmrq81j23s2o4ai3esis8ocnu2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
