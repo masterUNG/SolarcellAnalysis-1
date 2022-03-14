@@ -7,6 +7,7 @@ class Myconstant {
   static String routeSettings = '/settings';
   static String routeAbout = '/about';
   static String routeAddSiteId = '/addSiteId';
+  static String routeLoginByName = '/LoginByName';
   //Thai Paper Mill
   static String apiKey = '09HQHOJQYBLAF6N96LHGCGRFS68X13A9';
   static String siteId = '2345733';

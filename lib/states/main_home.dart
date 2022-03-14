@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -7,6 +8,8 @@ import 'package:solarcellanalysis/models/details_model.dart';
 import 'package:solarcellanalysis/models/menu_model.dart';
 import 'package:solarcellanalysis/models/overview_model.dart';
 import 'package:solarcellanalysis/models/site_current_power_flow_model.dart';
+import 'package:solarcellanalysis/models/site_model.dart';
+import 'package:solarcellanalysis/states/check_pin_code.dart';
 import 'package:solarcellanalysis/utility/my_constant.dart';
 import 'package:solarcellanalysis/widgets/show_button.dart';
 import 'package:solarcellanalysis/widgets/show_card.dart';
@@ -32,13 +35,13 @@ class _MainHomeState extends State<MainHome> {
     'Site Details',
     'Settings',
     'About',
-    'Logout',
+    
   ];
   var pathRounts = <String>[
     Myconstant.routeSiteDetails,
-    Myconstant.routeSettings,
-    Myconstant.routeAbout,
     '',
+    Myconstant.routeAbout,
+  
   ];
 
   var menuModels = <MenuModel>[];
@@ -47,6 +50,8 @@ class _MainHomeState extends State<MainHome> {
 
   OverviewModel? overviewModel;
   SiteCurrentPowerFlow? siteCurrentPowerFlow;
+  var datas = <String>[];
+  SiteModel? siteModel;
 
   @override
   void initState() {
@@ -73,7 +78,7 @@ class _MainHomeState extends State<MainHome> {
 
   Future<void> readData() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    var datas = preferences.getStringList('data');
+    datas = preferences.getStringList('data')!;
     // for Read Details
 
     String pathAPI =
@@ -111,12 +116,20 @@ class _MainHomeState extends State<MainHome> {
         siteCurrentPowerFlow = SiteCurrentPowerFlow.fromMap(result);
       });
     });
+
+    // for SiteMdel
+    await FirebaseFirestore.instance
+        .collection('Site')
+        .doc(datas[0])
+        .get()
+        .then((value) {
+      siteModel = SiteModel.fromMap(value.data()!);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     
       body: load
           ? ShowProgress()
           : LayoutBuilder(builder: (context, constraints) {
@@ -302,7 +315,21 @@ class _MainHomeState extends State<MainHome> {
           print('Status Route ==>> ${menuModel.pathRoute}');
           Navigator.pushNamed(context, menuModel.pathRoute);
         } else {
-          print('Status Logout');
+          print('You tap ==>${menuModel.title}');
+          switch (menuModel.title) {
+            case 'Settings':
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CheckPinCode(
+                      siteModel: siteModel!,
+                      siteId: datas[0],
+                      setting: true,
+                    ),
+                  ));
+              break;
+            default:
+          }
         }
       });
 

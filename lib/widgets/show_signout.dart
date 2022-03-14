@@ -16,7 +16,7 @@ class ShowSignOut extends StatelessWidget {
       onTap: () async {
         SharedPreferences preferences = await SharedPreferences.getInstance();
         preferences.clear().then((value) => Navigator.pushNamedAndRemoveUntil(
-            context, Myconstant.routeAddSiteId, (route) => false));
+            context, Myconstant.routeLoginByName, (route) => false));
       },
       child: const ShowCard(
           size: 120, label: 'Sign Out', pathImage: 'images/signout_icon.png'),
