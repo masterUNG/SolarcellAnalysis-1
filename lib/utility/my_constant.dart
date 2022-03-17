@@ -8,6 +8,9 @@ class Myconstant {
   static String routeAbout = '/about';
   static String routeAddSiteId = '/addSiteId';
   static String routeLoginByName = '/LoginByName';
+
+  static String appName = 'Solar Monitor';
+
   //Thai Paper Mill
   static String apiKey = '09HQHOJQYBLAF6N96LHGCGRFS68X13A9';
   static String siteId = '2345733';
@@ -54,7 +57,7 @@ class Myconstant {
         fontWeight: FontWeight.normal,
       );
 
-      TextStyle h3GreenStyle() => const TextStyle(
+  TextStyle h3GreenStyle() => const TextStyle(
         color: Color.fromARGB(255, 39, 182, 44),
         fontSize: 14,
         fontWeight: FontWeight.normal,

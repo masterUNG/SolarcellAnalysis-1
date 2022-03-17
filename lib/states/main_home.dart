@@ -4,18 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:solarcellanalysis/models/banner_model.dart';
 import 'package:solarcellanalysis/models/details_model.dart';
+import 'package:solarcellanalysis/models/env_benefits_model.dart';
 import 'package:solarcellanalysis/models/menu_model.dart';
 import 'package:solarcellanalysis/models/overview_model.dart';
 import 'package:solarcellanalysis/models/site_current_power_flow_model.dart';
 import 'package:solarcellanalysis/models/site_model.dart';
 import 'package:solarcellanalysis/states/check_pin_code.dart';
 import 'package:solarcellanalysis/utility/my_constant.dart';
+import 'package:solarcellanalysis/utility/my_dialog.dart';
 import 'package:solarcellanalysis/widgets/show_button.dart';
 import 'package:solarcellanalysis/widgets/show_card.dart';
+import 'package:solarcellanalysis/widgets/show_image.dart';
 import 'package:solarcellanalysis/widgets/show_progress.dart';
 import 'package:solarcellanalysis/widgets/show_signout.dart';
 import 'package:solarcellanalysis/widgets/show_text.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MainHome extends StatefulWidget {
   const MainHome({
@@ -35,23 +40,22 @@ class _MainHomeState extends State<MainHome> {
     'Site Details',
     'Settings',
     'About',
-    
   ];
   var pathRounts = <String>[
     Myconstant.routeSiteDetails,
     '',
     Myconstant.routeAbout,
-  
   ];
 
   var menuModels = <MenuModel>[];
-
   var chooseMenu;
+  EnvBenefitsModel? envBenefitsModel;
 
   OverviewModel? overviewModel;
   SiteCurrentPowerFlow? siteCurrentPowerFlow;
   var datas = <String>[];
   SiteModel? siteModel;
+  BannerModel? lastestBannerModel;
 
   @override
   void initState() {
@@ -79,6 +83,24 @@ class _MainHomeState extends State<MainHome> {
   Future<void> readData() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     datas = preferences.getStringList('data')!;
+
+    // for Read Banner
+    await FirebaseFirestore.instance
+        .collection('banner')
+        .orderBy('dateAdd', descending: true)
+        .get()
+        .then((value) {
+      bool status = true;
+      for (var item in value.docs) {
+        print('#17mar item Banner ==>> ${item.data()}');
+
+        if (status) {
+          lastestBannerModel = BannerModel.fromMap(item.data());
+          status = false;
+        }
+      }
+    });
+
     // for Read Details
 
     String pathAPI =
@@ -89,7 +111,7 @@ class _MainHomeState extends State<MainHome> {
 
       setState(() {
         detailsModel = DetailsModel.fromMap(detailsMap);
-        load = false;
+
         urlImage =
             'https://monitoringapi.solaredge.com${detailsModel!.uris.SITEIMAGE}?hash=123456789&api_key=${datas[1]}';
       });
@@ -125,6 +147,19 @@ class _MainHomeState extends State<MainHome> {
         .then((value) {
       siteModel = SiteModel.fromMap(value.data()!);
     });
+
+// for environment
+    String pathEnvBenefits =
+        'https://monitoringapi.solaredge.com/site/${datas[0]}/envBenefits?api_key=${datas[1]}';
+    await Dio().get(pathEnvBenefits).then((value) {
+      print('#17mar value EnvBenefits ==>> $value');
+      Map<String, dynamic> envBenefitsMap = value.data['envBenefits'];
+      print('#17mar envBenefitsMap ==>>> $envBenefitsMap');
+      setState(() {
+        load = false;
+        envBenefitsModel = EnvBenefitsModel.fromMap(envBenefitsMap);
+      });
+    });
   }
 
   @override
@@ -133,101 +168,236 @@ class _MainHomeState extends State<MainHome> {
       body: load
           ? ShowProgress()
           : LayoutBuilder(builder: (context, constraints) {
-              return Column(
-                children: [
-                  newinforTop(constraints),
-                  newPowerLoadGrid(constraints),
-                  SizedBox(
-                    height: constraints.maxWidth * 0.25,
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                const ShowText(label: 'Today'),
-                                ShowText(
-                                  label: overviewModel == null
-                                      ? ''
-                                      : calculateValue(
-                                          overviewModel!.lastDayData.energy),
-                                  textStyle: Myconstant().h2Style(),
-                                ),
-                                ShowText(label: ''),
-                              ],
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                ShowText(label: 'This Mounth'),
-                                ShowText(
-                                  label: overviewModel == null
-                                      ? ''
-                                      : calculateValue(
-                                          overviewModel!.lastMonthData.energy),
-                                  textStyle: Myconstant().h2Style(),
-                                ),
-                                ShowText(label: ''),
-                              ],
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                ShowText(label: 'LifeTime'),
-                                ShowText(
-                                  label: overviewModel == null
-                                      ? ''
-                                      : calculateValue(
-                                          overviewModel!.lifeTimeData.energy),
-                                  textStyle: Myconstant().h2Style(),
-                                ),
-                                ShowText(
-                                  label: overviewModel == null
-                                      ? ''
-                                      : calculateCurrency(
-                                          overviewModel!.lifeTimeData.revenue),
-                                  textStyle: Myconstant().h3GreenStyle(),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    newinforTop(constraints),
+                    newPowerLoadGrid(constraints),
+                    newPowerFlow(constraints),
+                    newBanner(constraints),
+                    newMaintenance(
+                        constraints: constraints,
+                        path: 'images/ma1.png',
+                        label: 'Maintenance 1',
+                        timestamp: siteModel!.mainten1),
+                    newMaintenance(
+                        constraints: constraints,
+                        path: 'images/ma2.png',
+                        label: 'Maintenance 2',
+                        timestamp: siteModel!.mainten2),
+                    newMaintenance(
+                        constraints: constraints,
+                        path: 'images/ma3.png',
+                        label: 'Maintenance 3',
+                        timestamp: siteModel!.mainten3),
+                    newEnvBenefits(
+                      constraints: constraints,
+                      path: 'images/tree.png',
+                      label: 'Equivalent Trees Planted',
+                      value: envBenefitsModel!.treesPlanted,
                     ),
-                  )
-                ],
+                    newEnvBenefits(
+                        constraints: constraints,
+                        path: 'images/co2.png',
+                        label: 'CO2 Emission Saved',
+                        value: envBenefitsModel!.gasEmissionSaved.co2,
+                        units: envBenefitsModel!.gasEmissionSaved.units),
+                  ],
+                ),
               );
             }),
     );
   }
 
-  Row newPowerLoadGrid(BoxConstraints Constraints) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        ShowCard(
-          size: Constraints.maxWidth * 0.33,
-          label: overviewModel == null
-              ? ''
-              : '${overviewModel!.currentPower.power} kW',
-          pathImage: 'images/current_power.png',
+  Widget newBanner(BoxConstraints constraints) {
+    return InkWell(
+      onTap: () {
+        gotoUrl();
+      },
+      child: SizedBox(
+        width: constraints.maxWidth,
+        child: lastestBannerModel == null
+            ? const ShowProgress()
+            : Image.network(lastestBannerModel!.pathBanner),
+      ),
+    );
+  }
+
+  Card newEnvBenefits({
+    required BoxConstraints constraints,
+    required String path,
+    required String label,
+    required double value,
+    String? units,
+  }) {
+    String valueString = '';
+    if (envBenefitsModel != null) {
+      NumberFormat format = NumberFormat('#,###.##', 'en_US');
+      valueString = format.format(value);
+      if (units != null) {
+        valueString = '$valueString $units';
+      }
+    }
+
+    return Card(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: constraints.maxWidth * 0.75,
+            child: ListTile(
+              leading: ShowImage(
+                path: path,
+              ),
+              title: ShowText(label: label),
+              subtitle: ShowText(
+                label: envBenefitsModel == null ? '' : valueString,
+                textStyle: Myconstant().h3GreenStyle(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Card newMaintenance({
+    required BoxConstraints constraints,
+    required String path,
+    required String label,
+    required Timestamp timestamp,
+  }) {
+    String dateString = 'dd / MMM / yyyy';
+    DateFormat dateFormat = DateFormat('dd / MMM / yyyy');
+    dateString = dateFormat.format(timestamp.toDate());
+
+    return Card(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: constraints.maxWidth * 0.75,
+            child: ListTile(
+              leading: ShowImage(
+                path: path,
+              ),
+              title: ShowText(label: label),
+              subtitle: ShowText(
+                label: dateString,
+                textStyle: Myconstant().h3GreenStyle(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  SizedBox newPowerFlow(BoxConstraints constraints) {
+    return SizedBox(
+      height: constraints.maxWidth * 0.25,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  const ShowText(label: 'Today'),
+                  ShowText(
+                    label: overviewModel == null
+                        ? ''
+                        : calculateValue(overviewModel!.lastDayData.energy),
+                    textStyle: Myconstant().h2Style(),
+                  ),
+                  ShowText(label: ''),
+                ],
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ShowText(label: 'This Mounth'),
+                  ShowText(
+                    label: overviewModel == null
+                        ? ''
+                        : calculateValue(overviewModel!.lastMonthData.energy),
+                    textStyle: Myconstant().h2Style(),
+                  ),
+                  ShowText(label: ''),
+                ],
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ShowText(label: 'LifeTime'),
+                  ShowText(
+                    label: overviewModel == null
+                        ? ''
+                        : calculateValue(overviewModel!.lifeTimeData.energy),
+                    textStyle: Myconstant().h2Style(),
+                  ),
+                  ShowText(
+                    label: overviewModel == null
+                        ? ''
+                        : calculateCurrency(
+                            overviewModel!.lifeTimeData.revenue),
+                    textStyle: Myconstant().h3GreenStyle(),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        ShowCard(
-            size: Constraints.maxWidth * 0.33,
-            label: siteCurrentPowerFlow == null
-                ? ''
-                : '${siteCurrentPowerFlow!.load.currentPower} ${siteCurrentPowerFlow!.unit}',
-            pathImage: 'images/load.png'),
-        ShowCard(
-            size: Constraints.maxWidth * 0.33,
-            label: siteCurrentPowerFlow == null
-                ? ''
-                : '${siteCurrentPowerFlow!.grid.currentPower} ${siteCurrentPowerFlow!.unit}',
-            pathImage: 'images/grid.png'),
+      ),
+    );
+  }
+
+  Widget newPowerLoadGrid(BoxConstraints Constraints) {
+    return Stack(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            ShowCard(
+              size: Constraints.maxWidth * 0.33,
+              label: siteCurrentPowerFlow == null
+                  ? ''
+                  : '${siteCurrentPowerFlow!.pv.currentPower} kW',
+              pathImage: 'images/current_power.png',
+            ),
+            ShowCard(
+                size: Constraints.maxWidth * 0.33,
+                label: siteCurrentPowerFlow == null
+                    ? ''
+                    : '${siteCurrentPowerFlow!.load.currentPower} ${siteCurrentPowerFlow!.unit}',
+                pathImage: 'images/load.png'),
+            ShowCard(
+                size: Constraints.maxWidth * 0.33,
+                label: siteCurrentPowerFlow == null
+                    ? ''
+                    : '${siteCurrentPowerFlow!.grid.currentPower} ${siteCurrentPowerFlow!.unit}',
+                pathImage: 'images/grid.png'),
+          ],
+        ),
+        Positioned(
+          top: Constraints.maxWidth * 0.33 * 0.5 - 8,
+          left: Constraints.maxWidth * 0.33 - 8,
+          child: const Icon(
+            Icons.arrow_forward,
+            color: Colors.green,
+          ),
+        ),
+        Positioned(
+          top: Constraints.maxWidth * 0.33 * 0.5 - 8,
+          right: Constraints.maxWidth * 0.33 - 8,
+          child: const Icon(
+            Icons.arrow_back,
+            color: Colors.orange,
+          ),
+        )
       ],
     );
   }
@@ -363,5 +533,14 @@ class _MainHomeState extends State<MainHome> {
     String string = numberFormat.format(revenue);
     result = '฿ $string';
     return result;
+  }
+
+  Future<void> gotoUrl() async {
+    if (await canLaunch(lastestBannerModel!.pathUrl)) {
+      await launch(lastestBannerModel!.pathUrl);
+    } else {
+      MyDialog(context: context).normalDialog(
+          title: 'Banner Fail', message: 'Please Try Again Next Time');
+    }
   }
 }
