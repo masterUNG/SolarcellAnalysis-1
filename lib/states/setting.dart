@@ -61,12 +61,12 @@ class _SettingState extends State<Setting> {
             children: [
               newTitle('Change PinCode'),
               ShowForm(
-                  textInputType: TextInputType.number,
+                  textInputType: TextInputType.text,
                   hint: 'Current Pin Code',
                   changeFunc: (String string) =>
                       currentPinCode = string.trim()),
               ShowForm(
-                  textInputType: TextInputType.number,
+                  textInputType: TextInputType.text,
                   hint: 'New Pin Code',
                   changeFunc: (String string) => newPinCode = string.trim()),
               ShowButton(
@@ -82,10 +82,10 @@ class _SettingState extends State<Setting> {
                         MyDialog(context: context).normalDialog(
                             title: 'Current Pin Code False ?',
                             message: 'Please Fill Current Pin Code Again');
-                      } else if (newPinCode!.length != 4) {
+                      } else if (newPinCode!.length != 6) {
                         MyDialog(context: context).normalDialog(
-                            title: 'New Pin Code Must Be 4 Digit',
-                            message: 'Please Fill 4 Digit Pin Code');
+                            title: 'New Pin Code Must Be 6 Digit',
+                            message: 'Please Fill 6 Digit Pin Code');
                       } else {
                         processUpdatePinCode();
                       }
@@ -115,7 +115,7 @@ class _SettingState extends State<Setting> {
 
   Future<void> processUpdatePinCode() async {
     Map<String, dynamic> map = {};
-    map['pinCode'] = int.parse(newPinCode!);
+    map['pinCode'] = newPinCode;
     await FirebaseFirestore.instance
         .collection('Site')
         .doc(datas[0])

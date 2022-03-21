@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SiteModel {
   final String apiKey;
-  final int pinCode;
+  final String pinCode;
   final String name;
   final Timestamp mainten1;
   final Timestamp mainten2;
@@ -32,7 +32,7 @@ class SiteModel {
   factory SiteModel.fromMap(Map<String, dynamic> map) {
     return SiteModel(
       apiKey: map['apiKey'] ?? '',
-      pinCode: map['pinCode']?.toInt() ?? 0,
+      pinCode: map['pinCode'] ?? '',
       name: map['name'] ?? '',
       mainten1: (map['mainten1']),
       mainten2: (map['mainten2']),
