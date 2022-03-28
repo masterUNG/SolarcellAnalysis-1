@@ -30,7 +30,12 @@ class _LoginByNameState extends State<LoginByName> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                newLogo(constraints),
+                Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    newLogo(constraints),
+                    newLogo2(constraints),
+                  ],
+                ),
                 newSiteName(),
                 newLogin(),
               ],
@@ -54,15 +59,21 @@ class _LoginByNameState extends State<LoginByName> {
 
   ShowForm newSiteName() {
     return ShowForm(
-      hint: 'SiteName',
+      hint: ': Site Name',
       changeFunc: (String string) => siteName = string.trim(),
     );
   }
 
   SizedBox newLogo(BoxConstraints Constraints) {
     return SizedBox(
-      width: Constraints.maxWidth * 0.4,
+      width: Constraints.maxWidth * 0.2,
       child: const ShowImage(),
+    );
+  }
+  SizedBox newLogo2(BoxConstraints Constraints) {
+    return SizedBox(
+      width: Constraints.maxWidth * 0.23,
+      child: const ShowImage2(),
     );
   }
 

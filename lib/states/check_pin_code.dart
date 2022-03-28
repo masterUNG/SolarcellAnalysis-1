@@ -44,7 +44,12 @@ class _CheckPinCodeState extends State<CheckPinCode> {
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          newImage(),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              newImage(),
+              newImage2(),
+            ],
+          ),
           SizedBox(
             height: 16,
           ),
@@ -77,6 +82,7 @@ class _CheckPinCodeState extends State<CheckPinCode> {
   }
 
   SizedBox newImage() => SizedBox(width: 120, child: ShowImage());
+  SizedBox newImage2() => SizedBox(width: 140, child: ShowImage2());
 
   Future<void> processSaveData() async {
     var datas = <String>[];
