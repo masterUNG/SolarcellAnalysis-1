@@ -20,6 +20,7 @@ import 'package:solarcellanalysis/widgets/show_image.dart';
 import 'package:solarcellanalysis/widgets/show_progress.dart';
 import 'package:solarcellanalysis/widgets/show_signout.dart';
 import 'package:solarcellanalysis/widgets/show_text.dart';
+import 'package:url_launcher/link.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MainHome extends StatefulWidget {
@@ -175,33 +176,35 @@ class _MainHomeState extends State<MainHome> {
                     newPowerLoadGrid(constraints),
                     newPowerFlow(constraints),
                     newBanner(constraints),
-                    newMaintenance(
-                        constraints: constraints,
-                        path: 'images/ma1.png',
-                        label: 'Maintenance 1',
-                        timestamp: siteModel!.mainten1),
-                    newMaintenance(
-                        constraints: constraints,
-                        path: 'images/ma2.png',
-                        label: 'Maintenance 2',
-                        timestamp: siteModel!.mainten2),
-                    newMaintenance(
-                        constraints: constraints,
-                        path: 'images/ma3.png',
-                        label: 'Maintenance 3',
-                        timestamp: siteModel!.mainten3),
-                    newEnvBenefits(
-                      constraints: constraints,
-                      path: 'images/tree.png',
-                      label: 'Equivalent Trees Planted',
-                      value: envBenefitsModel!.treesPlanted,
-                    ),
-                    newEnvBenefits(
-                        constraints: constraints,
-                        path: 'images/co2.png',
-                        label: 'CO2 Emission Saved',
-                        value: envBenefitsModel!.gasEmissionSaved.co2,
-                        units: envBenefitsModel!.gasEmissionSaved.units),
+                    newMaintenance3(constraints),
+                    newMaintenance4(constraints),
+                    // newMaintenance2(
+                    //     constraints: constraints,
+                    //     path: 'images/ma1.png',
+                    //     label: 'Maintenance 1',
+                    //     timestamp: siteModel!.mainten1),
+                    // newMaintenance2(
+                    //     constraints: constraints,
+                    //     path: 'images/ma2.png',
+                    //     label: 'Maintenance 2',
+                    //     timestamp: siteModel!.mainten2),
+                    // newMaintenance2(
+                    //     constraints: constraints,
+                    //     path: 'images/ma3.png',
+                    //     label: 'Maintenance 3',
+                    //     timestamp: siteModel!.mainten3),
+                    // newEnvBenefits(
+                    //   constraints: constraints,
+                    //   path: 'images/tree.png',
+                    //   label: 'Equivalent Trees Planted',
+                    //   value: envBenefitsModel!.treesPlanted,
+                    // ),
+                    // newEnvBenefits(
+                    //     constraints: constraints,
+                    //     path: 'images/co2.png',
+                    //     label: 'CO2 Emission Saved',
+                    //     value: envBenefitsModel!.gasEmissionSaved.co2,
+                    //     units: envBenefitsModel!.gasEmissionSaved.units),
                   ],
                 ),
               );
@@ -261,37 +264,145 @@ class _MainHomeState extends State<MainHome> {
     );
   }
 
-  Card newMaintenance({
-    required BoxConstraints constraints,
-    required String path,
-    required String label,
-    required Timestamp timestamp,
-  }) {
-    String dateString = 'dd / MMM / yyyy';
-    DateFormat dateFormat = DateFormat('dd / MMM / yyyy');
-    dateString = dateFormat.format(timestamp.toDate());
-
-    return Card(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: constraints.maxWidth * 0.75,
-            child: ListTile(
-              leading: ShowImage(
-                path: path,
-              ),
-              title: ShowText(label: label),
-              subtitle: ShowText(
-                label: dateString,
-                textStyle: Myconstant().h3GreenStyle(),
-              ),
+  Widget newPowerLoadGrid(BoxConstraints Constraints) {
+    return Stack(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            ShowCard(
+              size: Constraints.maxWidth * 0.33,
+              label: siteCurrentPowerFlow == null
+                  ? ''
+                  : '${siteCurrentPowerFlow!.pv.currentPower} kW',
+              pathImage: 'images/current_power.png',
             ),
+            ShowCard(
+                size: Constraints.maxWidth * 0.33,
+                label: siteCurrentPowerFlow == null
+                    ? ''
+                    : '${siteCurrentPowerFlow!.load.currentPower} ${siteCurrentPowerFlow!.unit}',
+                pathImage: 'images/load.png'),
+            ShowCard(
+                size: Constraints.maxWidth * 0.33,
+                label: siteCurrentPowerFlow == null
+                    ? ''
+                    : '${siteCurrentPowerFlow!.grid.currentPower} ${siteCurrentPowerFlow!.unit}',
+                pathImage: 'images/grid.png'),
+          ],
+        ),
+        Positioned(
+          top: Constraints.maxWidth * 0.33 * 0.5 - 8,
+          left: Constraints.maxWidth * 0.33 - 8,
+          child: const Icon(
+            Icons.arrow_forward,
+            color: Colors.green,
+          ),
+        ),
+        Positioned(
+          top: Constraints.maxWidth * 0.33 * 0.5 - 8,
+          right: Constraints.maxWidth * 0.33 - 8,
+          child: const Icon(
+            Icons.arrow_back,
+            color: Colors.orange,
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget newMaintenance3(BoxConstraints Constraints) {
+    return Stack(children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          ShowCard2(
+            size: Constraints.maxWidth * 0.33,
+            label: siteCurrentPowerFlow == null ? '' : 'Client Info',
+            pathImage: 'images/info.png',
+          ),
+          ShowCard3(
+              size: Constraints.maxWidth * 0.33,
+              label: siteCurrentPowerFlow == null ? '' : 'Contact Us',
+              pathImage: 'images/contact.png'),
+          Link(
+            uri: Uri.parse('setting.dart'),
+            builder:
+                (BuildContext context, Future<void> Function()? followLink) {return
+              Column(
+                children: [
+                  ShowCard4(
+                      size: Constraints.maxWidth * 0.33,
+                      label:
+                          siteCurrentPowerFlow == null ? '' : 'System Detail',
+                      pathImage: 'images/ma3.png'),
+                ],
+              );
+            },
           ),
         ],
       ),
-    );
+    ]);
   }
+
+  Widget newMaintenance4(BoxConstraints Constraints) {
+    return Stack(children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          ShowCard2(
+            size: Constraints.maxWidth * 0.33,
+            label: siteCurrentPowerFlow == null
+                ? ''
+                : '${siteCurrentPowerFlow!.pv.currentPower} kW',
+            pathImage: 'images/ma1.png',
+          ),
+          ShowCard2(
+              size: Constraints.maxWidth * 0.33,
+              label: siteCurrentPowerFlow == null
+                  ? ''
+                  : '${siteCurrentPowerFlow!.load.currentPower} ${siteCurrentPowerFlow!.unit}',
+              pathImage: 'images/co2.png'),
+          ShowCard2(
+              size: Constraints.maxWidth * 0.33,
+              label: siteCurrentPowerFlow == null ? '' : 'Environments',
+              pathImage: 'images/tree.png'),
+        ],
+      ),
+    ]);
+  }
+
+  // Card newMaintenance({
+  //   required BoxConstraints constraints,
+  //   required String path,
+  //   required String label,
+  //   required Timestamp timestamp,
+  // }) {
+  //   String dateString = 'dd / MMM / yyyy';
+  //   DateFormat dateFormat = DateFormat('dd / MMM / yyyy');
+  //   dateString = dateFormat.format(timestamp.toDate());
+
+  //   return Card(
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         SizedBox(
+  //           width: constraints.maxWidth * 0.75,
+  //           child: ListTile(
+  //             leading: ShowImage(
+  //               path: path,
+  //             ),
+  //             title: ShowText(label: label),
+  //             subtitle: ShowText(
+  //               label: dateString,
+  //               textStyle: Myconstant().h3GreenStyle(),
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   SizedBox newPowerFlow(BoxConstraints constraints) {
     return SizedBox(
@@ -355,7 +466,7 @@ class _MainHomeState extends State<MainHome> {
     );
   }
 
-  Widget newPowerLoadGrid(BoxConstraints Constraints) {
+  Widget newPowerLoadGrid2(BoxConstraints Constraints) {
     return Stack(
       children: [
         Row(
@@ -536,6 +647,15 @@ class _MainHomeState extends State<MainHome> {
   }
 
   Future<void> gotoUrl() async {
+    if (await canLaunch(lastestBannerModel!.pathUrl)) {
+      await launch(lastestBannerModel!.pathUrl);
+    } else {
+      MyDialog(context: context).normalDialog(
+          title: 'Banner Fail', message: 'Please Try Again Next Time');
+    }
+  }
+
+  Future<void> gotoUrl2() async {
     if (await canLaunch(lastestBannerModel!.pathUrl)) {
       await launch(lastestBannerModel!.pathUrl);
     } else {

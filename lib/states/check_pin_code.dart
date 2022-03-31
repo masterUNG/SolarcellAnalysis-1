@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
@@ -7,6 +9,7 @@ import 'package:solarcellanalysis/models/site_model.dart';
 import 'package:solarcellanalysis/utility/my_constant.dart';
 import 'package:solarcellanalysis/utility/my_dialog.dart';
 import 'package:solarcellanalysis/widgets/show_image.dart';
+import 'package:solarcellanalysis/widgets/show_text.dart';
 
 class CheckPinCode extends StatefulWidget {
   final SiteModel siteModel;
@@ -44,11 +47,18 @@ class _CheckPinCodeState extends State<CheckPinCode> {
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
             children: [
               newImage(),
               newImage2(),
             ],
+            
+          ),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
+            children: [
+             newImage3(),
+            ],
+            
           ),
           SizedBox(
             height: 16,
@@ -83,6 +93,7 @@ class _CheckPinCodeState extends State<CheckPinCode> {
 
   SizedBox newImage() => SizedBox(width: 120, child: ShowImage());
   SizedBox newImage2() => SizedBox(width: 140, child: ShowImage2());
+  SizedBox newImage3() => SizedBox(width: 20, child: ShowImage3());
 
   Future<void> processSaveData() async {
     var datas = <String>[];
