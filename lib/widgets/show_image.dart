@@ -36,3 +36,15 @@ class ShowImage3 extends StatelessWidget {
     return Image.asset(path ?? 'images/space.png');
   }
 }
+class ShowImage4 extends StatelessWidget {
+  final String? path;
+  const ShowImage4({
+    Key? key,
+    this.path,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(path ?? 'images/contact.png');
+  }
+}

@@ -22,6 +22,7 @@ import 'package:solarcellanalysis/widgets/show_signout.dart';
 import 'package:solarcellanalysis/widgets/show_text.dart';
 import 'package:url_launcher/link.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:solarcellanalysis/states/router.dart';
 
 class MainHome extends StatefulWidget {
   const MainHome({
@@ -176,6 +177,8 @@ class _MainHomeState extends State<MainHome> {
                     newPowerLoadGrid(constraints),
                     newPowerFlow(constraints),
                     newBanner(constraints),
+
+
                     newMaintenance3(constraints),
                     newMaintenance4(constraints),
                     // newMaintenance2(
@@ -310,41 +313,32 @@ class _MainHomeState extends State<MainHome> {
       ],
     );
   }
-
-  Widget newMaintenance3(BoxConstraints Constraints) {
+Widget newMaintenance3(BoxConstraints Constraints) {
     return Stack(children: [
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           ShowCard2(
             size: Constraints.maxWidth * 0.33,
-            label: siteCurrentPowerFlow == null ? '' : 'Client Info',
+            label: siteCurrentPowerFlow == null
+                ? ''
+                : 'Client Info',
             pathImage: 'images/info.png',
           ),
-          ShowCard3(
+          ShowCard2(
               size: Constraints.maxWidth * 0.33,
-              label: siteCurrentPowerFlow == null ? '' : 'Contact Us',
+              label: siteCurrentPowerFlow == null
+                  ? ''
+                  : 'Contact Us',
               pathImage: 'images/contact.png'),
-          Link(
-            uri: Uri.parse('setting.dart'),
-            builder:
-                (BuildContext context, Future<void> Function()? followLink) {return
-              Column(
-                children: [
-                  ShowCard4(
-                      size: Constraints.maxWidth * 0.33,
-                      label:
-                          siteCurrentPowerFlow == null ? '' : 'System Detail',
-                      pathImage: 'images/ma3.png'),
-                ],
-              );
-            },
-          ),
+          ShowCard2(
+              size: Constraints.maxWidth * 0.33,
+              label: siteCurrentPowerFlow == null ? '' : 'MLM',
+              pathImage: 'images/MLM.png'),
         ],
       ),
     ]);
   }
-
   Widget newMaintenance4(BoxConstraints Constraints) {
     return Stack(children: [
       Row(
@@ -354,15 +348,15 @@ class _MainHomeState extends State<MainHome> {
             size: Constraints.maxWidth * 0.33,
             label: siteCurrentPowerFlow == null
                 ? ''
-                : '${siteCurrentPowerFlow!.pv.currentPower} kW',
-            pathImage: 'images/ma1.png',
+                : 'Advertistment',
+            pathImage: 'images/ads.png',
           ),
           ShowCard2(
               size: Constraints.maxWidth * 0.33,
               label: siteCurrentPowerFlow == null
                   ? ''
-                  : '${siteCurrentPowerFlow!.load.currentPower} ${siteCurrentPowerFlow!.unit}',
-              pathImage: 'images/co2.png'),
+                  : 'Settings',
+              pathImage: 'images/ma1.png'),
           ShowCard2(
               size: Constraints.maxWidth * 0.33,
               label: siteCurrentPowerFlow == null ? '' : 'Environments',
@@ -371,6 +365,32 @@ class _MainHomeState extends State<MainHome> {
       ),
     ]);
   }
+  //   Widget newMaintenance5(BoxConstraints Constraints) {
+  //   return Stack(children: [
+  //     Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //       children: [
+  //         ShowCard2(
+  //           size: Constraints.maxWidth * 0.33,
+  //           label: siteCurrentPowerFlow == null
+  //               ? ''
+  //               : 'Advertistment',
+  //           pathImage: 'images/ads.png',
+  //         ),
+  //         ShowCard2(
+  //             size: Constraints.maxWidth * 0.33,
+  //             label: siteCurrentPowerFlow == null
+  //                 ? ''
+  //                 : '${siteCurrentPowerFlow!.load.currentPower} ${siteCurrentPowerFlow!.unit}',
+  //             pathImage: 'images/ma1.png'),
+  //         ShowCard2(
+  //             size: Constraints.maxWidth * 0.33,
+  //             label: siteCurrentPowerFlow == null ? '' : 'Environments',
+  //             pathImage: 'images/tree.png'),
+  //       ],
+  //     ),
+  //   ]);
+  // }
 
   // Card newMaintenance({
   //   required BoxConstraints constraints,
@@ -403,7 +423,7 @@ class _MainHomeState extends State<MainHome> {
   //     ),
   //   );
   // }
-
+  
   SizedBox newPowerFlow(BoxConstraints constraints) {
     return SizedBox(
       height: constraints.maxWidth * 0.25,
