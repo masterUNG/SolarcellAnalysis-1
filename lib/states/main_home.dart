@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solarcellanalysis/models/banner_model.dart';
@@ -14,15 +13,11 @@ import 'package:solarcellanalysis/models/site_model.dart';
 import 'package:solarcellanalysis/states/check_pin_code.dart';
 import 'package:solarcellanalysis/utility/my_constant.dart';
 import 'package:solarcellanalysis/utility/my_dialog.dart';
-import 'package:solarcellanalysis/widgets/show_button.dart';
 import 'package:solarcellanalysis/widgets/show_card.dart';
 import 'package:solarcellanalysis/widgets/show_image.dart';
 import 'package:solarcellanalysis/widgets/show_progress.dart';
-import 'package:solarcellanalysis/widgets/show_signout.dart';
 import 'package:solarcellanalysis/widgets/show_text.dart';
-import 'package:url_launcher/link.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:solarcellanalysis/states/router.dart';
 
 class MainHome extends StatefulWidget {
   const MainHome({
@@ -177,8 +172,6 @@ class _MainHomeState extends State<MainHome> {
                     newPowerLoadGrid(constraints),
                     newPowerFlow(constraints),
                     newBanner(constraints),
-
-
                     newMaintenance3(constraints),
                     newMaintenance4(constraints),
                     // newMaintenance2(
@@ -313,53 +306,45 @@ class _MainHomeState extends State<MainHome> {
       ],
     );
   }
-Widget newMaintenance3(BoxConstraints Constraints) {
+Widget newMaintenance3(BoxConstraints constraints) {
     return Stack(children: [
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           ShowCard2(
-            size: Constraints.maxWidth * 0.33,
-            label: siteCurrentPowerFlow == null
-                ? ''
-                : 'Client Info',
+            size: constraints.maxWidth * 0.33,
+            label:'Client Info',
             pathImage: 'images/info.png',
           ),
           ShowCard2(
-              size: Constraints.maxWidth * 0.33,
-              label: siteCurrentPowerFlow == null
-                  ? ''
-                  : 'Contact Us',
+              size: constraints.maxWidth * 0.33,
+              label: 'Contact Us',
               pathImage: 'images/contact.png'),
           ShowCard2(
-              size: Constraints.maxWidth * 0.33,
-              label: siteCurrentPowerFlow == null ? '' : 'MLM',
+              size: constraints.maxWidth * 0.33,
+              label: 'MLM',
               pathImage: 'images/MLM.png'),
         ],
       ),
     ]);
   }
-  Widget newMaintenance4(BoxConstraints Constraints) {
+  Widget newMaintenance4(BoxConstraints constraints) {
     return Stack(children: [
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           ShowCard2(
-            size: Constraints.maxWidth * 0.33,
-            label: siteCurrentPowerFlow == null
-                ? ''
-                : 'Advertistment',
+            size: constraints.maxWidth * 0.33,
+            label: 'Advertistment',
             pathImage: 'images/ads.png',
           ),
           ShowCard2(
-              size: Constraints.maxWidth * 0.33,
-              label: siteCurrentPowerFlow == null
-                  ? ''
-                  : 'Settings',
+              size: constraints.maxWidth * 0.33,
+              label: 'Settings',
               pathImage: 'images/ma1.png'),
           ShowCard2(
-              size: Constraints.maxWidth * 0.33,
-              label: siteCurrentPowerFlow == null ? '' : 'Environments',
+              size: constraints.maxWidth * 0.33,
+              label: 'Environments' ,
               pathImage: 'images/tree.png'),
         ],
       ),
