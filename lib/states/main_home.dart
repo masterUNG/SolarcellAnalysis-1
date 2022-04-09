@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +12,12 @@ import 'package:solarcellanalysis/models/menu_model.dart';
 import 'package:solarcellanalysis/models/overview_model.dart';
 import 'package:solarcellanalysis/models/site_current_power_flow_model.dart';
 import 'package:solarcellanalysis/models/site_model.dart';
+import 'package:solarcellanalysis/states/advertisment.dart';
 import 'package:solarcellanalysis/states/check_pin_code.dart';
+import 'package:solarcellanalysis/states/client_info.dart';
+import 'package:solarcellanalysis/states/contact_us.dart';
+import 'package:solarcellanalysis/states/enviromments.dart';
+import 'package:solarcellanalysis/states/mlm.dart';
 import 'package:solarcellanalysis/utility/my_constant.dart';
 import 'package:solarcellanalysis/utility/my_dialog.dart';
 import 'package:solarcellanalysis/widgets/show_card.dart';
@@ -56,7 +63,6 @@ class _MainHomeState extends State<MainHome> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     readData();
     setupMenu();
@@ -163,7 +169,7 @@ class _MainHomeState extends State<MainHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: load
-          ? ShowProgress()
+          ? const ShowProgress()
           : LayoutBuilder(builder: (context, constraints) {
               return SingleChildScrollView(
                 child: Column(
@@ -306,46 +312,80 @@ class _MainHomeState extends State<MainHome> {
       ],
     );
   }
-Widget newMaintenance3(BoxConstraints constraints) {
+
+  Widget newMaintenance3(BoxConstraints constraints) {
     return Stack(children: [
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          ShowCard2(
-            size: constraints.maxWidth * 0.33,
-            label:'Client Info',
-            pathImage: 'images/info.png',
+          InkWell(
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ClientInfo(),
+                )),
+            child: ShowCard2(
+              size: constraints.maxWidth * 0.33,
+              label: 'Client Info',
+              pathImage: 'images/info.png',
+            ),
           ),
-          ShowCard2(
-              size: constraints.maxWidth * 0.33,
-              label: 'Contact Us',
-              pathImage: 'images/contact.png'),
-          ShowCard2(
-              size: constraints.maxWidth * 0.33,
-              label: 'MLM',
-              pathImage: 'images/MLM.png'),
+          InkWell(
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ContactUs(),
+                )),
+            child: ShowCard2(
+                size: constraints.maxWidth * 0.33,
+                label: 'Contact Us',
+                pathImage: 'images/contact.png'),
+          ),
+          InkWell(onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const Mlm(),
+                )),
+            child: ShowCard2(
+                size: constraints.maxWidth * 0.33,
+                label: 'MLM',
+                pathImage: 'images/MLM.png'),
+          ),
         ],
       ),
     ]);
   }
+
   Widget newMaintenance4(BoxConstraints constraints) {
     return Stack(children: [
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          ShowCard2(
-            size: constraints.maxWidth * 0.33,
-            label: 'Advertistment',
-            pathImage: 'images/ads.png',
+          InkWell(onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const Advertistment(),
+                )),
+            child: ShowCard2(
+              size: constraints.maxWidth * 0.33,
+              label: 'Advertistment',
+              pathImage: 'images/ads.png',
+            ),
           ),
           ShowCard2(
               size: constraints.maxWidth * 0.33,
               label: 'Settings',
               pathImage: 'images/ma1.png'),
-          ShowCard2(
-              size: constraints.maxWidth * 0.33,
-              label: 'Environments' ,
-              pathImage: 'images/tree.png'),
+          InkWell(onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const Environments(),
+                )),
+            child: ShowCard2(
+                size: constraints.maxWidth * 0.33,
+                label: 'Environments',
+                pathImage: 'images/tree.png'),
+          ),
         ],
       ),
     ]);
@@ -408,7 +448,7 @@ Widget newMaintenance3(BoxConstraints constraints) {
   //     ),
   //   );
   // }
-  
+
   SizedBox newPowerFlow(BoxConstraints constraints) {
     return SizedBox(
       height: constraints.maxWidth * 0.25,
