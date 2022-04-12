@@ -18,6 +18,7 @@ import 'package:solarcellanalysis/states/client_info.dart';
 import 'package:solarcellanalysis/states/contact_us.dart';
 import 'package:solarcellanalysis/states/enviromments.dart';
 import 'package:solarcellanalysis/states/mlm.dart';
+import 'package:solarcellanalysis/states/site_details.dart';
 import 'package:solarcellanalysis/utility/my_constant.dart';
 import 'package:solarcellanalysis/utility/my_dialog.dart';
 import 'package:solarcellanalysis/widgets/show_card.dart';
@@ -322,7 +323,7 @@ class _MainHomeState extends State<MainHome> {
             onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ClientInfo(),
+                  builder: (context) => const SiteDetail(),
                 )),
             child: ShowCard2(
               size: constraints.maxWidth * 0.33,
