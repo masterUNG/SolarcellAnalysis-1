@@ -1,4 +1,4 @@
-import 'dart:ffi';
+
 
 import 'package:flutter/material.dart';
 import 'package:otp_text_field/otp_text_field.dart';
@@ -9,7 +9,6 @@ import 'package:solarcellanalysis/models/site_model.dart';
 import 'package:solarcellanalysis/utility/my_constant.dart';
 import 'package:solarcellanalysis/utility/my_dialog.dart';
 import 'package:solarcellanalysis/widgets/show_image.dart';
-import 'package:solarcellanalysis/widgets/show_text.dart';
 
 class CheckPinCode extends StatefulWidget {
   final SiteModel siteModel;
