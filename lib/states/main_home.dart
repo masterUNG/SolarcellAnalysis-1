@@ -335,7 +335,7 @@ class _MainHomeState extends State<MainHome> {
             onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ContactUs(),
+                  builder: (context) => ContactUs(datas: datas,),
                 )),
             child: ShowCard2(
                 size: constraints.maxWidth * 0.33,
