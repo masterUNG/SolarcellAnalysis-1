@@ -271,23 +271,37 @@ class _MainHomeState extends State<MainHome> {
     return Stack(
       children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            ShowCard(
-              size: Constraints.maxWidth * 0.33,
-              label: siteCurrentPowerFlow == null
-                  ? ''
-                  : '${siteCurrentPowerFlow!.pv.currentPower} kW',
-              pathImage: 'images/current_power.png',
+            Column(
+              children: [
+                ShowCard(
+                  size: Constraints.maxWidth * 0.33,
+                  label: siteCurrentPowerFlow == null
+                      ? ''
+                      : '${siteCurrentPowerFlow!.pv.currentPower} kW',
+                  pathImage: 'images/current_power.png',
+                ),
+                ShowCard(
+                  size: Constraints.maxWidth * 0.33,
+                  label: siteCurrentPowerFlow == null
+                      ? ''
+                      : '${siteCurrentPowerFlow!.pv.currentPower} kW',
+                  pathImage: 'images/batter5.png',
+                ),
+              ],
             ),
             ShowCard(
                 size: Constraints.maxWidth * 0.33,
+                height: Constraints.maxWidth * 0.66,
                 label: siteCurrentPowerFlow == null
                     ? ''
                     : '${siteCurrentPowerFlow!.load.currentPower} ${siteCurrentPowerFlow!.unit}',
                 pathImage: 'images/load.png'),
             ShowCard(
                 size: Constraints.maxWidth * 0.33,
+                height: Constraints.maxWidth * 0.66,
                 label: siteCurrentPowerFlow == null
                     ? ''
                     : '${siteCurrentPowerFlow!.grid.currentPower} ${siteCurrentPowerFlow!.unit}',
@@ -335,14 +349,17 @@ class _MainHomeState extends State<MainHome> {
             onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ContactUs(datas: datas,),
+                  builder: (context) => ContactUs(
+                    datas: datas,
+                  ),
                 )),
             child: ShowCard2(
                 size: constraints.maxWidth * 0.33,
                 label: 'Contact Us',
                 pathImage: 'images/contact.png'),
           ),
-          InkWell(onTap: () => Navigator.push(
+          InkWell(
+            onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const Mlm(),
@@ -362,7 +379,8 @@ class _MainHomeState extends State<MainHome> {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          InkWell(onTap: () => Navigator.push(
+          InkWell(
+            onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const Advertistment(),
@@ -377,7 +395,8 @@ class _MainHomeState extends State<MainHome> {
               size: constraints.maxWidth * 0.33,
               label: 'Settings',
               pathImage: 'images/ma1.png'),
-          InkWell(onTap: () => Navigator.push(
+          InkWell(
+            onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const Environments(),
